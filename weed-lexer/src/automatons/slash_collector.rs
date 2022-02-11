@@ -71,6 +71,7 @@ where
 				},
 				State::BlockSemiFull => match cursor.current() {
 					Some(c) => match c {
+						'*' => cursor.consume(),
 						'/' => {
 							state = State::Finished;
 							cursor.consume();

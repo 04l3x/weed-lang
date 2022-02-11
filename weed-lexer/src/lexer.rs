@@ -92,7 +92,6 @@ mod tests {
 	}
 
 	#[test]
-	#[ignore] //FIXME
 	fn this_fails() {
 		let input = "
 			/***/
