@@ -24,55 +24,49 @@ where
 		let mut state = State::Initial;
 		let mut buffer = String::new();
 
-		println!("collecting digits");
-
 		while state != State::StopCollecting {
 			match cursor.current() {
-				Some(c) => {
-					println!("Coll {}", c);
-
-					match c {
-						'0' => match state {
-							State::Initial => {
-								if buffer.is_empty() {
-									cursor.push_buffer(&mut buffer, c);
-								} else {
-									cursor.consume();
-								}
-							}
-							_ => cursor.push_buffer(&mut buffer, c),
-						},
-
-						'1'..='9' => match state {
-							State::Initial => {
-								state = State::CollectingIntegers;
+				Some(c) => match c {
+					'0' => match state {
+						State::Initial => {
+							if buffer.is_empty() {
 								cursor.push_buffer(&mut buffer, c);
+							} else {
+								cursor.consume();
 							}
-							_ => cursor.push_buffer(&mut buffer, c),
-						},
+						}
+						_ => cursor.push_buffer(&mut buffer, c),
+					},
 
-						'.' => match state {
-							State::Initial => {
-								state = State::CollectingDecimals;
-								if buffer.is_empty() {
-									buffer.push('0');
-								}
-								cursor.push_buffer(&mut buffer, c);
-							}
-							State::CollectingIntegers => {
-								state = State::CollectingDecimals;
-								cursor.push_buffer(&mut buffer, c);
-							}
-							State::CollectingDecimals => return Err(Self::Error::default()),
-							_ => {}
-						},
+					'1'..='9' => match state {
+						State::Initial => {
+							state = State::CollectingIntegers;
+							cursor.push_buffer(&mut buffer, c);
+						}
+						_ => cursor.push_buffer(&mut buffer, c),
+					},
 
-						_ => match state {
-							_ => state = State::StopCollecting,
-						},
-					}
-				}
-				None => state = State::StopCollecting,
+					'.' => match state {
+						State::Initial => {
+							state = State::CollectingDecimals;
+							if buffer.is_empty() {
+								buffer.push('0');
+							}
+							cursor.push_buffer(&mut buffer, c);
+						}
+						State::CollectingIntegers => {
+							state = State::CollectingDecimals;
+							cursor.push_buffer(&mut buffer, c);
+						}
+						State::CollectingDecimals => return Err(Self::Error::default()),
+						_ => {}
+					},
+
+					_ => match state {
+						_ => state = State::StopCollecting,
+					},
+				},
+				_ => state = State::StopCollecting,
 			}
 		}
 

@@ -17,11 +17,9 @@ where
 	type State = State;
 
 	fn eat(cursor: &mut T) {
-		println!("eating");
 		let mut state = State::Initial;
 
 		while state != State::Full {
-			println!("eating: {:?}", cursor.current());
 			match state {
 				State::Initial | State::Hungry => match cursor.current() {
 					Some(c) => {
@@ -34,9 +32,7 @@ where
 							state = State::Full;
 						}
 					}
-					None => {
-						state = State::Full;
-					}
+					_ => state = State::Full,
 				},
 				_ => {}
 			}

@@ -25,29 +25,26 @@ where
 
 		while state != State::StopCollecting {
 			match cursor.current() {
-				Some(c) => {
-					println!("Coll {}", c);
-					match c {
-						'_' | 'A'..='Z' | 'a'..='z' => match state {
-							State::Initial | State::Collecting => {
-								if state == State::Initial {
-									state = State::Collecting;
-								}
-								cursor.push_buffer(&mut buffer, c);
+				Some(c) => match c {
+					'_' | 'A'..='Z' | 'a'..='z' => match state {
+						State::Initial | State::Collecting => {
+							if state == State::Initial {
+								state = State::Collecting;
 							}
-							_ => {}
-						},
-						'0'..='9' => match state {
-							State::Collecting => cursor.push_buffer(&mut buffer, c),
-							_ => return Err(Self::Error::default()),
-						},
-						_ => match state {
-							State::Initial => return Err(Self::Error::default()),
-							_ => state = State::StopCollecting,
-						},
-					}
-				}
-				None => state = State::StopCollecting,
+							cursor.push_buffer(&mut buffer, c);
+						}
+						_ => {}
+					},
+					'0'..='9' => match state {
+						State::Collecting => cursor.push_buffer(&mut buffer, c),
+						_ => return Err(Self::Error::default()),
+					},
+					_ => match state {
+						State::Initial => return Err(Self::Error::default()),
+						_ => state = State::StopCollecting,
+					},
+				},
+				_ => state = State::StopCollecting,
 			}
 		}
 		Ok(Token::get(buffer))

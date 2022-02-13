@@ -11,6 +11,7 @@ pub enum State {
 	Finished,
 }
 
+//TODO: add bkslash state for collect quoutes in string
 impl<'a, T, I> Collector<'a, T, I, Token> for StringsCollector
 where
 	I: Iterator<Item = char>,
@@ -31,7 +32,7 @@ where
 						State::Initial => state = State::Collecting,
 						State::Collecting => {
 							state = State::Finished;
-						},
+						}
 						_ => {}
 					},
 					_ => match state {
@@ -40,7 +41,7 @@ where
 						_ => {}
 					},
 				},
-				None => return Err(Self::Error::default()),
+				_ => return Err(Self::Error::default()),
 			}
 			cursor.advance(stoped);
 		}

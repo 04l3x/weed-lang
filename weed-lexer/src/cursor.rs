@@ -131,7 +131,6 @@ where
 			match state {
 				Self::State::Initial => match cursor.current() {
 					Some(c) => {
-						println!("CHAR IN NEXT TOKEN: {}", c);
 						match c {
 							'/' => match SlashCollector::collect(cursor) {
 								Ok(c) => match c {

@@ -34,7 +34,7 @@ where
 						}
 						_ => return Err(Self::Error::default()),
 					},
-					_ => state = State::Finished,
+					_ => return Err(Self::Error::default()),
 				},
 				State::Single => match cursor.current() {
 					Some(c) => match c {

@@ -50,14 +50,14 @@ where
 						}
 						_ => state = State::Finished,
 					},
-					_ => {}
+					_ => state = State::Finished,
 				},
 				State::LineComment => match cursor.current() {
 					Some(c) => match c {
 						'\n' => state = State::Finished,
 						_ => cursor.consume(),
 					},
-					_ => {}
+					_ => state = State::Finished,
 				},
 				State::BlockComment => match cursor.current() {
 					Some(c) => match c {
@@ -67,7 +67,7 @@ where
 						}
 						_ => cursor.consume(),
 					},
-					_ => {}
+					_ => return Err(Self::Error::default()),
 				},
 				State::BlockSemiFull => match cursor.current() {
 					Some(c) => match c {
@@ -81,7 +81,7 @@ where
 							cursor.consume()
 						}
 					},
-					_ => {}
+					_ => return Err(Self::Error::default()),
 				},
 				_ => {}
 			}
