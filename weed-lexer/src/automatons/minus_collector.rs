@@ -89,7 +89,7 @@ where
 			}
 		}
 
-		if buffer.len() > 2 {
+		if buffer.len() > 1 {
 			if buffer.contains(".") {
 				Ok(Token::get_float_literal(buffer))
 			} else {
