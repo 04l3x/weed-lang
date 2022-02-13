@@ -40,7 +40,10 @@ where
 						_ => return Err(Self::Error::default()),
 					},
 					_ => match state {
-						State::Initial => return Err(Self::Error::default()),
+						State::Initial => {
+							cursor.consume();
+							return Err(Self::Error::default());
+						}
 						_ => state = State::StopCollecting,
 					},
 				},

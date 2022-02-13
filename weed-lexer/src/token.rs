@@ -102,6 +102,9 @@ impl Token {
 			"." => Token {
 				token: TokenKind::Symbol(Symbol::Punctuation(PunctuationSymbols::Dot)),
 			},
+			"," => Token {
+				token: TokenKind::Symbol(Symbol::Punctuation(PunctuationSymbols::Comma)),
+			},
 			"!" => Token {
 				token: TokenKind::Symbol(Symbol::Logic(LogicSymbols::Not)),
 			},
