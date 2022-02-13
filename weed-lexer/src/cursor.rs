@@ -32,14 +32,17 @@ where
 		}
 	}
 
-	pub fn next_token<'a>(&mut self) -> Option<Token> {
+	pub fn next_token<'a>(&mut self) -> Option<Result<Token, LexerError>> {
 		if !self.started {
 			self.consume();
 			self.started = true;
 		}
 		match Tokenizer::collect(self) {
-			Ok(t) => t,
-			Err(e) => panic!("Lexer Error: {:?}", e),
+			Ok(t) => match t {
+				Some(t) => Some(Ok(t)),
+				None => None,
+			},
+			Err(e) => Some(Err(e)),
 		}
 	}
 }
@@ -130,30 +133,28 @@ where
 
 			match state {
 				Self::State::Initial => match cursor.current() {
-					Some(c) => {
-						match c {
-							'/' => match SlashCollector::collect(cursor) {
-								Ok(c) => match c {
-									Some(t) => return Ok(Some(t)),
-									_ => {}
-								},
-								Err(e) => return Err(e),
+					Some(c) => match c {
+						'/' => match SlashCollector::collect(cursor) {
+							Ok(c) => match c {
+								Some(t) => return Ok(Some(t)),
+								_ => {}
 							},
-							'-' => return Ok(Some(MinusCollector::collect(cursor)?)),
-							'|' => return Ok(Some(PlecaCollector::collect(cursor)?)),
-							'&' => return Ok(Some(AmpersandCollector::collect(cursor)?)),
-							'=' | '+' | '<' | '>' | '*' | '%' | '!' => {
-								return Ok(Some(DoubleSymbolsCollector::collect(cursor)?))
-							}
-							'(' | ')' | '[' | ']' | '{' | '}' | '\\' | ':' | ';' | '.' | ',' => {
-								return Ok(Some(SingleSymbolsCollector::collect(cursor)?))
-							}
-							'\"' => return Ok(Some(StringsCollector::collect(cursor)?)),
-							'0'..='9' => return Ok(Some(DigitsCollector::collect(cursor)?)),
-							'\0' => state = Self::State::Finished,
-							_ => return Ok(Some(WordsCollector::collect(cursor)?)),
+							Err(e) => return Err(e),
+						},
+						'-' => return Ok(Some(MinusCollector::collect(cursor)?)),
+						'|' => return Ok(Some(PlecaCollector::collect(cursor)?)),
+						'&' => return Ok(Some(AmpersandCollector::collect(cursor)?)),
+						'=' | '+' | '<' | '>' | '*' | '%' | '!' => {
+							return Ok(Some(DoubleSymbolsCollector::collect(cursor)?))
 						}
-					}
+						'(' | ')' | '[' | ']' | '{' | '}' | '\\' | ':' | ';' | '.' | ',' => {
+							return Ok(Some(SingleSymbolsCollector::collect(cursor)?))
+						}
+						'\"' => return Ok(Some(StringsCollector::collect(cursor)?)),
+						'0'..='9' => return Ok(Some(DigitsCollector::collect(cursor)?)),
+						'\0' => state = Self::State::Finished,
+						_ => return Ok(Some(WordsCollector::collect(cursor)?)),
+					},
 					_ => return Ok(None),
 				},
 				_ => {}

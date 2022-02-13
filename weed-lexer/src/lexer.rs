@@ -1,7 +1,8 @@
 use crate::cursor::Cursor;
+use crate::error::LexerError;
 use crate::token::Token;
 
-pub fn tokenize<'a, I>(input: I) -> impl Iterator<Item = Token>
+pub fn tokenize<'a, I>(input: I) -> impl Iterator<Item = Result<Token, LexerError>>
 where
 	I: Iterator<Item = char>,
 {
@@ -24,28 +25,41 @@ mod tests {
 		let token_secuence = tokenize(input.chars());
 
 		let expected = vec![
-			Token::new(TokenKind::Keyword(Keyword::Burn)),
-			Token::new(TokenKind::Identifier("fire".to_string())),
-			Token::new(TokenKind::Symbol(Symbol::Group(GroupSymbols::BkSlash))),
-			Token::new(TokenKind::Symbol(Symbol::Slash)),
-			Token::new(TokenKind::Symbol(Symbol::Punctuation(
+			Ok(Token::new(TokenKind::Keyword(Keyword::Burn))),
+			Ok(Token::new(TokenKind::Identifier("fire".to_string()))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Group(
+				GroupSymbols::BkSlash,
+			)))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Slash))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Punctuation(
 				PunctuationSymbols::Colon,
+			)))),
+			Ok(Token::new(TokenKind::Keyword(Keyword::Dry))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Group(
+				GroupSymbols::LBracket,
+			)))),
+			Ok(Token::new(TokenKind::Identifier(
+				"console_output".to_string(),
 			))),
-			Token::new(TokenKind::Keyword(Keyword::Dry)),
-			Token::new(TokenKind::Symbol(Symbol::Group(GroupSymbols::LBracket))),
-			Token::new(TokenKind::Identifier("console_output".to_string())),
-			Token::new(TokenKind::Symbol(Symbol::Group(GroupSymbols::BkSlash))),
-			Token::new(TokenKind::Literal(Literal::Str {
+			Ok(Token::new(TokenKind::Symbol(Symbol::Group(
+				GroupSymbols::BkSlash,
+			)))),
+			Ok(Token::new(TokenKind::Literal(Literal::Str {
 				value: "hello world".to_string(),
-			})),
-			Token::new(TokenKind::Symbol(Symbol::Slash)),
-			Token::new(TokenKind::Symbol(Symbol::Punctuation(
+			}))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Slash))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Punctuation(
 				PunctuationSymbols::Semicolon,
-			))),
-			Token::new(TokenKind::Symbol(Symbol::Group(GroupSymbols::RBracket))),
+			)))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Group(
+				GroupSymbols::RBracket,
+			)))),
 		];
 
-		assert_eq!(token_secuence.collect::<Vec<Token>>(), expected);
+		assert_eq!(
+			token_secuence.collect::<Vec<Result<Token, LexerError>>>(),
+			expected
+		);
 	}
 
 	#[test]
@@ -58,37 +72,44 @@ mod tests {
 		let token_secuence = tokenize(input.chars());
 
 		let expected = vec![
-			Token::new(TokenKind::Keyword(Keyword::Puff)),
-			Token::new(TokenKind::Keyword(Keyword::Sativa)),
-			Token::new(TokenKind::Identifier("dollars_in_the_bank".to_string())),
-			Token::new(TokenKind::Symbol(Symbol::Operator(OperatorSymbols::Assign))),
-			Token::new(TokenKind::Literal(Literal::Int {
+			Ok(Token::new(TokenKind::Keyword(Keyword::Puff))),
+			Ok(Token::new(TokenKind::Keyword(Keyword::Sativa))),
+			Ok(Token::new(TokenKind::Identifier(
+				"dollars_in_the_bank".to_string(),
+			))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Operator(
+				OperatorSymbols::Assign,
+			)))),
+			Ok(Token::new(TokenKind::Literal(Literal::Int {
 				value: "0".to_string(),
-			})),
-			Token::new(TokenKind::Symbol(Symbol::Arithmetic(
+			}))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Arithmetic(
 				ArithmeticSymbols::Minus,
-			))),
-			Token::new(TokenKind::Literal(Literal::Int {
+			)))),
+			Ok(Token::new(TokenKind::Literal(Literal::Int {
 				value: "0".to_string(),
-			})),
-			Token::new(TokenKind::Symbol(Symbol::Arithmetic(
+			}))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Arithmetic(
 				ArithmeticSymbols::Plus,
-			))),
-			Token::new(TokenKind::Literal(Literal::Int {
+			)))),
+			Ok(Token::new(TokenKind::Literal(Literal::Int {
 				value: "0".to_string(),
-			})),
-			Token::new(TokenKind::Symbol(Symbol::Arithmetic(
+			}))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Arithmetic(
 				ArithmeticSymbols::Multiply,
-			))),
-			Token::new(TokenKind::Literal(Literal::Int {
+			)))),
+			Ok(Token::new(TokenKind::Literal(Literal::Int {
 				value: "0".to_string(),
-			})),
-			Token::new(TokenKind::Symbol(Symbol::Punctuation(
+			}))),
+			Ok(Token::new(TokenKind::Symbol(Symbol::Punctuation(
 				PunctuationSymbols::Semicolon,
-			))),
+			)))),
 		];
 
-		assert_eq!(token_secuence.collect::<Vec<Token>>(), expected);
+		assert_eq!(
+			token_secuence.collect::<Vec<Result<Token, LexerError>>>(),
+			expected
+		);
 	}
 
 	#[test]
@@ -99,7 +120,10 @@ mod tests {
 
 		let token_secuence = tokenize(input.chars());
 
-		let expected = vec![];
-		assert_eq!(token_secuence.collect::<Vec<Token>>(), expected);
+		let expected: Vec<Result<Token, LexerError>> = vec![];
+		assert_eq!(
+			token_secuence.collect::<Vec<Result<Token, LexerError>>>(),
+			expected
+		);
 	}
 }
